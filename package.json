@@ -12,6 +12,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@orion.ui/orion": "^2.1.2",
+    "@primeuix/themes": "^2.0.1",
+    "paper": "^0.12.18",
+    "primeicons": "^7.0.0",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"

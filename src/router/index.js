@@ -1,13 +1,48 @@
 import { createRouter, createMemoryHistory } from 'vue-router'
 
+const adminPages = [
+  {
+    path: '/users',
+    name: 'users',
+    component: () => import('@/pages/users.vue'),
+  },
+  {
+    path: '/groups',
+    name: 'groups',
+    component: () => import('@/pages/groups.vue'),
+  },
+  {
+    path: '/usercard/:name',
+    name: 'usercard',
+    component: () => import('@/pages/usercard.vue'),
+  },
+]
+
+
+const userPages = [
+  {
+    path: '/maps',
+    name: 'maps',
+    component: () => import('@/pages/maps.vue'),
+  },
+]
+
+
 const router = createRouter({
   history: createMemoryHistory(import.meta.env.BASE_URL),
   
   routes: [
     {
       path: '/',
-      name: 'maps',
-      component: () => import('../pages/maps.vue'),
+      name: 'userView',
+      component: () => import('@/views/userView.vue'),
+      children: userPages
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('@/views/adminView.vue'),
+      children: adminPages
     },
   ],
 })
