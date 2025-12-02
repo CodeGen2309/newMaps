@@ -1,6 +1,7 @@
 <script setup>
   import { onMounted } from 'vue';
   import maps from '../../public/mocks/maps.js';
+  import userMap from '../components/map.vue'
 
 
   onMounted(() => {
@@ -32,7 +33,8 @@
     </div>
 
     <div class="maps--block maps--content">
-      <img class="maps--contentImg" src="/img/map.jpg">
+      <img loading="lazy" class="maps--contentImg" src="/img/map.jpg">
+      <!-- <userMap /> -->
     </div>
   </section>
 </template>

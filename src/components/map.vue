@@ -1,17 +1,19 @@
 <script>
-  import { onMounted } from "vue";
+  import { onMounted, ref } from "vue";
 
   import paper from "paper"
-  import camera from '../lib/camera.js'
-  import Panel from '../components/toolPanel.svelte'
-  import utils from '../lib/multiTool.js'
+  import camera from '@/lib/camera.js'
+  import utils from '@/lib/multiTool.js'
 
-  let mapContainer, canvas, map, mapGroup,
+  let map, mapGroup,
   dragTool, activeCamera
 
   let scaleFactor = 1
   let currRotate = 0
   let currScale = 1
+
+  let canvas = ref()
+  let mapContainer = ref()
 
   onMounted(() => {
     paper.setup(canvas)
@@ -133,21 +135,14 @@
 
 
 
-<div class="map__conainer"
-  bind:this={mapContainer} 
-  on:wheel={mouseWheelHandler}
->
-  <canvas class="map" bind:this={canvas}></canvas>
-</div>
-
-
-<Panel
-  on:viewAngle={ changeAngle }
-  on:rotateEvent={ rotateCamera }
-  on:radiusEvent={ changeRadius }
->
-</Panel>
-
+<template>
+  <div class="map__conainer"
+    ref="mapContainer"
+    on:wheel="mouseWheelHandler"
+  >
+    <canvas class="map" ref="canvas"></canvas>
+  </div>
+</template>
 
 
 <style>
