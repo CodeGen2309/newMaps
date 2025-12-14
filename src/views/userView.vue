@@ -1,7 +1,7 @@
 <script setup>
   import { onMounted } from 'vue';
   import maps from '../../public/mocks/maps.js';
-  import userMap from '../components/map.vue'
+  import userMap from '@/components/map.vue'
 
 
   onMounted(() => {
@@ -14,13 +14,13 @@
   <section class="maps">
     <div class="maps--block maps--menu">
       <ul class="maps--menuList">
-        <o-button v-for="item in maps"
-          block="true"
-          color="brand"
-          prefix-icon="map_pin"
-        >
-          {{  item.title }}
-        </o-button>
+        <RouterLink v-for="item, id in maps" to="/maps">
+          <o-button block="true"
+            color="brand" prefix-icon="map_pin"
+          >
+            {{ item.title }}
+          </o-button>
+        </RouterLink>
       </ul>
 
       <div class="maps--menuFooter">
@@ -33,8 +33,7 @@
     </div>
 
     <div class="maps--block maps--content">
-      <img loading="lazy" class="maps--contentImg" src="/img/map.jpg">
-      <!-- <userMap /> -->
+      <userMap></userMap>
     </div>
   </section>
 </template>

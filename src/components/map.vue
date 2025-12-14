@@ -1,29 +1,39 @@
-<script>
-  import { onMounted, ref } from "vue";
+<script setup>
+  import { onMounted, ref, useTemplateRef } from "vue";
+  import toolPanel from "@/components/toolPanel.vue";
 
   import paper from "paper"
   import camera from '@/lib/camera.js'
   import utils from '@/lib/multiTool.js'
 
-  let map, mapGroup,
-  dragTool, activeCamera
+  // Init reactives
+  let map = ref()
+  let mapGroup
+  let activeCamera
+
+
 
   let scaleFactor = 1
   let currRotate = 0
   let currScale = 1
 
-  let canvas = ref()
-  let mapContainer = ref()
+  let canvasItem = useTemplateRef('canvasItem')
 
   onMounted(() => {
-    paper.setup(canvas)
+    paper.setup(canvasItem.value)
     mapGroup = new paper.Group()
-    map = new paper.Raster('/img/map.jpg')
-    map.scale(0.7)
+    let image = new paper.Raster('/public/img/map.jpg')
+    mapGroup.addChild(image)
+    console.log(mapGroup.position);
+    
 
-    mapGroup.addChild(map)
+    mapGroup.onMouseDrag = function (event) {
+      mapGroup.position.x += event.delta.x
+      mapGroup.position.y += event.delta.y
+      console.log(mapGroup.position);
+    }
+    
     mapGroup.onDoubleClick = setCamera
-    initDragTool()
   })
 
   function eventLogger (ent) {
@@ -31,53 +41,22 @@
     console.log(ent);
   }
 
-  function initDragTool () {
-    let mapKey = 'shift'
-    dragTool = new paper.Tool()
-
-    dragTool.onKeyDown = ent => {
-      if (ent.key == mapKey) {
-        mapGroup.onMouseMove = mapDrag
-      }
-    }
-
-    dragTool.onKeyUp = ent => {
-      if (ent.key == mapKey) {
-        mapGroup.onMouseMove = null
-      }
-    }
-  }
-
-  function mapDrag (ent) {
-    let bounds = mapGroup.bounds
-    let width = canvas.width
-    let height = canvas.height
-
-    mapGroup.position.x += ent.delta.x
-    mapGroup.position.y += ent.delta.y
-    
-    if (bounds.left > 0)        { bounds.left = 0 }
-    if (bounds.top > 0)         { bounds.top = 0 }
-    if (bounds.right < width)   { bounds.right = width }
-    if (bounds.bottom < height) { bounds.bottom = height }
-  }
 
   function mouseWheelHandler (ent) {
     let delta = ent.wheelDeltaY
 
     if (delta > 0 && scaleFactor < 2) {
+    // if (delta > 0 ) {
       scaleFactor *= 1.1
-      zoom(1.1)
+      mapGroup.scale(1.1, [ent.screenX, ent.screenY])
     }
 
     if (delta < 0 && scaleFactor > 0.4) { 
+    // if (delta < 0 ) { 
       scaleFactor *= 0.9
-      zoom(0.9)
+      mapGroup.scale(0.9, [ent.screenX, ent.screenY])
     }
-  }
 
-  function zoom (factor) {
-    mapGroup.scale(factor)
   }
 
   function setCamera (ent) {
@@ -93,6 +72,7 @@
     changeActiveCamera(item)
   }
 
+
   function changeActiveCamera (item) {
     if (activeCamera) {
       activeCamera.setViewOpacity(0.2)
@@ -103,19 +83,14 @@
   }
 
 
-  function rotateCamera (ent) {
-    let angle = ent.detail.rotateAngle
-
+  function rotateCamera (angle) {
     if (angle == undefined) { return true }
     if (activeCamera == undefined) { return true }
     activeCamera.rotateCamera(angle, scaleFactor)
   }
 
 
-  function changeRadius (ent) {
-    let rds = ent.detail.radius
-    console.log(rds);
-
+  function changeRadius (rds) {
     if (rds == undefined) { return true }
     if (activeCamera == undefined) { return true }
 
@@ -123,12 +98,10 @@
   }
 
 
-  function changeAngle (ent) {
-    let angle = ent.detail.viewAngle
-
-    if (angle == undefined) { return true }
+  function changeAngle (viewAngle) {
+    if (viewAngle == undefined) { return true }
     if (activeCamera == undefined) { return true }
-    activeCamera.setViewAngle(angle, scaleFactor)
+    activeCamera.setViewAngle(viewAngle, scaleFactor)
   }
 </script>
 
@@ -136,18 +109,40 @@
 
 
 <template>
-  <div class="map__conainer"
-    ref="mapContainer"
-    on:wheel="mouseWheelHandler"
-  >
-    <canvas class="map" ref="canvas"></canvas>
+  <div class="map--holder">
+    <canvas class="map" ref="canvasItem" 
+      @wheel="mouseWheelHandler"
+    />
+
+    <toolPanel class="map--tools"
+      @rotateEvent="rotateCamera"
+      @viewAngle="changeAngle"
+      @radiusEvent="changeRadius"
+    />
   </div>
 </template>
 
 
 <style>
-  .map {
-    width: 100vw;
-    min-height: 99vh;
-  }
+.map--holder {
+  position: relative;
+  width: 100%; height: 100%;
+}
+
+.map--container {
+}
+
+.map {
+  width: 100%; height: 100%;
+}
+
+.map--tools {
+  position: absolute;
+  bottom: 0; left: 0;
+  background: rgba(255, 255, 255, .8);
+  padding: 20px; margin: 10px;
+
+  border-radius: 20px;
+
+}
 </style>

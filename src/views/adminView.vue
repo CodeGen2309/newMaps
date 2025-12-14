@@ -72,7 +72,6 @@ let pages = [
   display: flex;
   gap: 20px;
 
-  background: white;
   width: 100vw; height: 100vh;
   padding: 20px;
   box-sizing: border-box;

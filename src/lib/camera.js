@@ -3,7 +3,7 @@ import paper from "paper"
 export default class {
   constructor ({
     radius = 200, position = [0, 0],
-    scale = 1, paper, angle = 30,
+    scale = 1, angle = 30,
     cameraAngle = 40
   }) {
 
