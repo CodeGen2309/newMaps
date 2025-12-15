@@ -94,6 +94,12 @@
   transition: .3s;
 }
 
+.maps--menuFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 
 .maps--content {
   flex-grow: 1;

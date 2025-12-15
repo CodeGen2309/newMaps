@@ -15,15 +15,15 @@ export default class {
     this.areaOpacity = 0.2
 
     this.group = new paper.Group()
-    this.eye = this.createEye()
-    this.viewZone = this.createZone()
+    // this.eye = this.createEye()
+    // this.viewZone = this.createZone()
   }
 
   
   createEye () {
     let eye = new paper.Raster({
       source: '/icons/eosMin.png',
-      position: this.position
+      position: this.position,
     })
 
     eye.scale(this.scale)
@@ -100,6 +100,19 @@ export default class {
     this.position = this.eye.position
     this.radius = radius
     this.scale = scale
+    this.viewZone = this.createZone()
+  }
+
+  
+  createHolder () {
+    this.eye = this.createEye()
+    this.eye.opacity = 0.3
+  }
+
+
+  createCamera () {
+    if (this.eye) { this.eye.remove() }
+    this.eye = this.createEye()
     this.viewZone = this.createZone()
   }
 }
