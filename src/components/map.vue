@@ -144,13 +144,14 @@
 
       <div class="map--toolButtons">
         <OButton class="map--addCamera" color="info" 
-          prefix-icon="camera" @click="setCamera"
+          prefix-icon="camera" @click="setCamera" block="true"
         >Добавить камеру</OButton>
 
-        <OButton class="map--addCamera" color="danger" 
+        <OButton class="map--addCamera" color="danger" block="true"
           prefix-icon="camera" @click="removeActiveCamera"
         >Удалить</OButton>
       </div>
+
     </div>
 
     <Transition name="fadeRightAnim">
@@ -174,23 +175,34 @@
 }
 
 .map--tools {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   position: absolute;
   bottom: 0; left: 0;
-  margin: 10px;
+  margin: 20px;
 }
 
 .map--toolPanel {
   background: rgba(255, 255, 255, .6);
   border: 2px solid white;
-  padding: 20px; margin: 10px;
+  padding: 20px;
   backdrop-filter: blur(10px);
+  overflow: hidden;
 
   border-radius: 10px;
   transition: .3s;
 }
 
+.map--toolButtons {
+  display: flex;
+  gap: 10px;
+  /* padding: 10px 0px; */
+  width: 510px;
+}
+
+
 .map--addCamera {
-  margin: 10px;
   padding: 10px 20px;
   border-radius: 10px;
 }
