@@ -26,7 +26,9 @@ let mockGroups = {
   <div class="sInfo">
     <label class="sInfo--label">
       <p class="sInfo--title">IP камеры</p>
-      <OInput v-model="cameraIP" label="IP камеры" />
+      <OInput v-model="cameraIP" label="IP камеры"
+        class="sInfo--input"
+      />
     </label>
 
     <label class="sInfo--label">
@@ -59,5 +61,12 @@ let mockGroups = {
 
 .sInfo--title {
   font-size: 1rem;
+}
+
+.sInfo--label {
+  color: rgb(0, 0, 0, .8);
+}
+
+.sInfo--input {
 }
 </style>
