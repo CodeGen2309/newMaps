@@ -1,5 +1,9 @@
 <script setup>
-  import { RouterLink, RouterView } from 'vue-router'
+import { inject } from 'vue';
+import { RouterLink, RouterView } from 'vue-router'
+
+inject('$cookies')
+
 </script>
 
 <template>

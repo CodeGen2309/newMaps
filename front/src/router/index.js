@@ -34,6 +34,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'welcome',
+      component: () => import('@/pages/welcome.vue'),
+    },
+    {
+      path: '/user',
       name: 'userView',
       component: () => import('@/views/userView.vue'),
       children: userPages

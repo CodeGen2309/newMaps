@@ -2,3 +2,24 @@ body {
   margin: 0; padding: 0;
   font-family: 'Courier New', Courier, monospace;
 }
+
+
+:root {
+  --base-color: hsl(247 75% 60%);
+  --border-color: hsl(247 75% 90%);
+  --bakground-color: hsl(247 75% 80%);
+}
+
+
+.flex--row-cc {
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+
+.flex--col-cc {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
