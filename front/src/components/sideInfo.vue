@@ -1,11 +1,46 @@
 <script setup>
 import { onMounted, ref, defineProps } from 'vue'
 import apirator from '@/lib/apirator'
+import { useNotif } from '@orion.ui/orion'
 
 let props = defineProps(['camera'])
 
 let groupsList = ref([])
 let groups     = ref([])
+
+
+async function saveCamera () {
+  let position = {
+    x: Math.round(props.camera.position.x),
+    y: Math.round(props.camera.position.y)
+  }
+
+  let mapGroupPosition = {
+    x: Math.round(props.camera.mapGroupPosition.x),
+    y: Math.round(props.camera.mapGroupPosition.y)
+  }
+  
+
+  let data = {
+    mapID: props.camera.mapID,
+    name: null,
+    groups: JSON.stringify(props.camera.groups),
+    cameraIP: props.camera.cameraIP,
+    hostIP: props.camera.hostIP,
+    status: props.camera.status,
+    position: JSON.stringify(position),
+    mapGroupPosition: JSON.stringify(mapGroupPosition),
+    cameraAngle: props.camera.cameraAngle,
+    viewAngle: props.camera.viewAngle,
+    radius: props.camera.radius,
+  }
+
+  if (props.camera.id) { await apirator.update('cameras', data, { id: camera.id }) }
+  else { await apirator.insert('cameras', data) }
+
+  console.log(data);
+  useNotif.success('Камера сохранена')
+}
 
 
 onMounted( async () => {
@@ -46,7 +81,12 @@ onMounted( async () => {
 
     <div class="spacer"></div>
 
-    <OButton color="info" @click="$emit('saveCamera', camera)">Сохранить</OButton>
+    <OButton color="info" 
+      click="$emit('saveCamera', camera)"
+      @click="saveCamera"
+    >
+      Сохранить
+    </OButton>
   </section>
 </template>
 

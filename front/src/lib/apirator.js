@@ -1,5 +1,5 @@
 export default {
-  apiUrl:  'http://localhost:3000',
+  apiUrl:  'http://172.16.11.112:3000',
 
   setPostOpts (data) {
     return { 

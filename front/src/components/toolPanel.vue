@@ -1,10 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
 
-let rotateAngle = ref(0)
-let viewAngle = ref(0)
-let radius = ref(0)
-
+let props = defineProps(['camera'])
 
 </script>
 
@@ -14,8 +11,8 @@ let radius = ref(0)
       <p class="tools--title">Поворот</p>
 
       <input type="range" min = "0" max="360"
-        v-model="rotateAngle"
-        @input="$emit('rotateEvent', rotateAngle )" 
+        v-model="camera.cameraAngle"
+        @input="$emit('rotateEvent', camera.cameraAngle )" 
       />
     </label>
 
@@ -23,8 +20,8 @@ let radius = ref(0)
       <p class="tools--title">Угол обзора (ширина) </p>
 
       <input type="range" min = "5" max="60"
-        v-model="viewAngle"
-        @input="$emit('viewAngle', viewAngle )" 
+        v-model="camera.viewAngle"
+        @input="$emit('viewAngle', camera.viewAngle )" 
       />
     </label>
 
@@ -32,8 +29,8 @@ let radius = ref(0)
       <p class="tools--title">Дальность</p>
 
       <input type="range" min = "100" max="600"
-        v-model="radius"
-        @input="$emit('radiusEvent', radius)" 
+        v-model="camera.radius"
+        @input="$emit('radiusEvent', camera.radius)" 
       />
     </label>
   </div>

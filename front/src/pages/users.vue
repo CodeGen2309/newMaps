@@ -9,6 +9,7 @@ let users = ref()
 
 function saveUser (user) {
   apirator.update('users', { name: user.name }, { id: user.id })
+  user.modified = false
   return true
 }
 

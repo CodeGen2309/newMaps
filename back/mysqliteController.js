@@ -30,7 +30,7 @@ export default class {
   insert (table, req, res) {
     let data     = req.body
     let response = this.conn.insert(table, data)
-    
+
     return res.send(response) 
   }
 
@@ -45,7 +45,7 @@ export default class {
 
 
   delete (table, req, res) {
-    let filter   = req.body
+    let filter = req.body
     let response = this.conn.delete(table, filter)
 
     return res.send(response) 

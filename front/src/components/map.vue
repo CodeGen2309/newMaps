@@ -1,134 +1,187 @@
 <script setup>
-  import { onMounted, ref, Transition, useTemplateRef } from "vue";
-  import toolPanel from "@/components/toolPanel.vue";
-  import sideInfo from "@/components/sideInfo.vue";
+import { onMounted, ref, Transition, useTemplateRef } from "vue";
 
-  import paper from "paper"
-  import camera from '@/lib/camera.js'
-  import utils from '@/lib/multiTool.js'
+import apirator from "@/lib/apirator";
+import toolPanel from "@/components/toolPanel.vue";
+import sideInfo from "@/components/sideInfo.vue";
 
-  // Init reactives
-  let mapGroup
-  let activeCamera = ref()
+import paper from "paper"
+import camera from '@/lib/camera.js'
+import utils from '@/lib/multiTool.js'
 
-  let scaleFactor = 1
-  let canvasCursorPoint = {x: 0, y: 0}
-  let canvasItem = useTemplateRef('canvasItem')
 
-  onMounted(() => {
-    paper.setup(canvasItem.value)
-    mapGroup = new paper.Group()
+// Init reactives
+let mapList = ref([])
+let cameraList = null
 
-    let image = new paper.Raster('/img/map.jpg')
-    mapGroup.addChild(image)
+let mapGroup
+let activeCamera = ref()
 
-    mapGroup.onMouseDrag = function (event) {
-      mapGroup.position.x += event.delta.x
-      mapGroup.position.y += event.delta.y
-    }
+let Factor = 1
+let canvasCursorPoint   = {x: 0, y: 0}
+let canvasItem = useTemplateRef('canvasItem')
 
-    mapGroup.onMouseMove = cursorPointObserver
+
+function eventLogger (ent) {
+  console.log('EVENT!');
+  console.log(ent);
+}
+
+
+function mouseWheelHandler (ent) {
+  let delta = ent.wheelDeltaY
+
+  if (delta > 0 ) {
+    paper.view.scale(1.2, canvasCursorPoint)
+  }
+
+  if (delta < 0 ) { 
+    paper.view.scale(0.8, canvasCursorPoint)
+  }
+}
+
+
+function setCamera (ent) {
+  let item = new camera({
+    paper: paper,
+    position: ent.point,
+    cameraAngle: utils.getRandomNumber(0, 360)
   })
 
+  mapGroup.addChild(item.group)
+  item.createHolder()
+  
+  mapGroup.onMouseMove = tst => {
+    item.group.setPosition(tst.point)
+  }
 
-  function eventLogger (ent) {
-    console.log('EVENT!');
-    console.log(ent);
+  item.group.onClick = ent => {
+    item.position = ent.point
+    item.createCamera()
+    mapGroup.onMouseMove = null    
+
+    item.mapGroupPosition = {
+      x: item.position.x - mapGroup.bounds.left,
+      y: item.position.y - mapGroup.bounds.top
+    }
+
+    item.group.onClick = ent => {
+      changeActiveCamera(item)
+      console.log(item);
+    }
+
+    changeActiveCamera(item)
+  }
+}
+
+
+function saveCamera (camera) {
+  activeCamera.value = camera
+  console.log(camera);
+}
+
+
+async function loadCameraList () {
+  cameraList = await apirator.get('cameras')
+  
+  for (let item of cameraList) {
+    loadCamera(item)
+  }
+}
+
+
+function loadCamera (cameraData) {
+  let item = new camera({
+    paper: paper,
+    id: cameraData.id,
+    position: JSON.parse(cameraData.mapGroupPosition),
+    mapGroupPosition: JSON.parse(cameraData.mapGroupPosition),
+    cameraAngle: cameraData.cameraAngle,
+    groups: JSON.parse(cameraData.groups),
+  })
+
+  mapGroup.addChild(item.group)
+  item.createCamera()
+
+  item.group.onClick = ent => changeActiveCamera(item)
+  console.log(item);
+  
+}
+
+
+function changeActiveCamera (item) {
+  if (activeCamera.value) {
+    activeCamera.value.setViewOpacity(0.2)
+  }
+
+  activeCamera.value = item
+  activeCamera.value.setViewOpacity(0.6)
+}
+
+function removeActiveCamera () {
+  let camera = activeCamera.value
+
+  apirator.delete('cameras', { id: camera.id })
+  camera.group.remove()
+  activeCamera.value = false
+}
+
+
+function rotateCamera (angle) {
+  if (!angle) { return false }
+  if (!activeCamera.value) { return false }
+  activeCamera.value.rotateCamera(angle)
+}
+
+
+function changeRadius (rds) {
+  if (!rds) { return false }
+  if (!activeCamera.value) { return false }
+  activeCamera.value.changeRadius(rds)
+}
+
+
+function changeAngle (viewAngle) {
+  if (!viewAngle) { return false }
+  if (!activeCamera.value) { return false }
+  activeCamera.value.setViewAngle(viewAngle)
+}
+
+
+onMounted(() => {
+  paper.setup(canvasItem.value)
+  mapGroup = new paper.Group()
+
+  let image = new paper.Raster('/img/map.jpg')
+  mapGroup.addChild(image)
+  // mapGroup.position = { x: 0, y: 0 }
+
+
+  mapGroup.onMouseDrag = function (event) {
+    mapGroup.position.x += event.delta.x
+    mapGroup.position.y += event.delta.y
   }
 
 
-  function cursorPointObserver (ent) {
+  paper.view.onMouseMove = function (ent) {
     canvasCursorPoint = ent.point
   }
 
 
-  function mouseWheelHandler (ent) {
-    let delta = ent.wheelDeltaY
-
-    if (delta > 0 ) {
-    // if (delta > 0 && scaleFactor < 2) {
-      scaleFactor *= 1.2
-      mapGroup.scale(1.2, canvasCursorPoint)
-    }
-
-    if (delta < 0 ) { 
-    // if (delta < 0 && scaleFactor > 0.4) { 
-      scaleFactor *= 0.8
-      mapGroup.scale(0.8, canvasCursorPoint)
-    }
-  }
-
-
-  function setCamera (ent) {
-    let item = new camera({
-      paper: paper,
-      position: canvasCursorPoint,
-      scale: scaleFactor,
-      cameraAngle: utils.getRandomNumber(0, 360)
-    })
-
-    mapGroup.addChild(item.group)
-    item.createHolder()
+  mapGroup.onClick = function (ent) {
+    let poin = ent.point
+    let bounds = mapGroup.bounds
     
-    mapGroup.onMouseMove = tst => {
-      item.group.position = tst.point
+    let respoint = { 
+      x: poin.x - bounds.left, y: poin.y - bounds.top 
     }
 
-    item.group.onClick = tst => {
-      item.position = tst.point
-      item.createCamera()
-
-      mapGroup.onMouseMove = cursorPointObserver
-      item.group.onClick = ent => changeActiveCamera(item)
-      changeActiveCamera(item)      
-    }
+    console.log(poin);
   }
 
 
-  function saveCamera (camera) {
-    activeCamera.value = camera
-    console.log(camera);
-  }
-
-
-  function changeActiveCamera (item) {
-    if (activeCamera.value) {
-      activeCamera.value.setViewOpacity(0.2)
-    }
-
-    activeCamera.value = item
-    activeCamera.value.setViewOpacity(0.6)
-    console.log(activeCamera.value);
-    
-  }
-
-  function removeActiveCamera () {
-    let camera = activeCamera.value
-    camera.group.remove()
-    activeCamera.value = false
-    console.log(activeCamera.value);
-  }
-
-
-  function rotateCamera (angle) {
-    if (!angle) { return false }
-    if (!activeCamera.value) { return false }
-    activeCamera.value.rotateCamera(angle, scaleFactor)
-  }
-
-
-  function changeRadius (rds) {
-    if (!rds) { return false }
-    if (!activeCamera.value) { return false }
-    activeCamera.value.changeRadius(rds, scaleFactor)
-  }
-
-
-  function changeAngle (viewAngle) {
-    if (!viewAngle) { return false }
-    if (!activeCamera.value) { return false }
-    activeCamera.value.setViewAngle(viewAngle, scaleFactor)
-  }
+  loadCameraList()
+})
 </script>
 
 
@@ -143,7 +196,7 @@
     <div class="map--tools">      
       <Transition name="fadeUpAnim">
         <toolPanel class="map--toolPanel"
-          v-if="activeCamera"
+          v-if="activeCamera" :camera="activeCamera"
           @rotateEvent="rotateCamera"
           @viewAngle="changeAngle"
           @radiusEvent="changeRadius"
@@ -164,7 +217,8 @@
 
     <Transition name="fadeRightAnim">
       <sideInfo v-if="activeCamera" class="map--sideInfo" :camera="activeCamera"
-        :key="activeCamera.position" @saveCamera="saveCamera"
+        :key="activeCamera.position"
+        saveCamera="saveCamera"
       />
     </Transition>
   </div>

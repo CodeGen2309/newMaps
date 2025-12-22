@@ -15,7 +15,7 @@ app.use(cors());
 
 
 // app.use('/', express.static(`public`));
-app.listen(3000, () => console.log("Server is running"));
+app.listen(3000, '0.0.0.0', () => console.log("Server is running"));
 app.get("/", (req, res) => { controller.select('groups', req, res) })
 
 app.post("/api/users/get",      (req, res) => { controller.select('users', req, res) })

@@ -2,8 +2,11 @@ import paper from "paper"
 
 export default class {
   constructor ({
-    radius = 200, position = [0, 0],
-    scale = 1, angle = 30,
+    id = false,
+    radius = 200, 
+    position = [0, 0],
+    mapGroupPosition = [0, 0],
+    angle = 30,
     cameraAngle = 40,
     cameraIP = '127.0.0.1', 
     hostIP = '127.0.0.1', 
@@ -12,8 +15,9 @@ export default class {
     groups = [],
   }) {
 
+    this.id = id
     this.position = position
-    this.scale = scale
+    this.mapGroupPosition = mapGroupPosition
     this.radius = radius
     this.viewAngle = angle
     this.cameraAngle = cameraAngle
@@ -22,7 +26,7 @@ export default class {
     this.hostIP = hostIP
     this.status = status
     this.groups = groups
-    this.mapID = mapID
+    this.mapID  = mapID
 
     this.group = new paper.Group()
   }
@@ -34,7 +38,6 @@ export default class {
       position: this.position,
     })
 
-    eye.scale(this.scale)
     this.group.addChild(eye)
     return eye
   }
@@ -75,7 +78,6 @@ export default class {
     view.opacity = this.areaOpacity
 
     view.rotate(this.cameraAngle, psn)
-    view.scale(this.scale, psn)
 
     this.group.addChild(view)
     return view
@@ -88,26 +90,23 @@ export default class {
   }
 
 
-  setViewAngle (angle, scale) {
+  setViewAngle (angle) {
     this.viewAngle = angle
-    this.scale = scale
     this.position = this.eye.position
     this.viewZone = this.createZone()
   }
 
 
-  rotateCamera (angle,scale) {
-    this.scale = scale
+  rotateCamera (angle) {
     this.cameraAngle = angle
     this.position = this.eye.position
     this.viewZone = this.createZone()
   }
 
 
-  changeRadius (radius, scale) {
+  changeRadius (radius) {
     this.position = this.eye.position
     this.radius = radius
-    this.scale = scale
     this.viewZone = this.createZone()
   }
 

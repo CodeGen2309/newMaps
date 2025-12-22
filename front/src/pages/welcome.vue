@@ -14,8 +14,8 @@ let password = ref()
 
 async function signIn () {
   let filter = { login: login.value }
-  let req    = await apirator.get('users', filter)
-  let user   = req[0]
+  let res    = await apirator.get('users', filter)
+  let user   = res[0]
 
   if ( res.length == 0 ) {
     return useNotif.danger('Нерправильный логин')
