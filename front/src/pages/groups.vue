@@ -1,13 +1,40 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import userStore from '@/stores/userStore';
+import apirator from '@/lib/apirator';
 
-let users = [
-  { id: 1, name: 'Безопасники' },
-  { id: 2, name: 'Админы' },
-  { id: 3, name: 'Охрана' },
-  { id: 4, name: 'Хер пойми зачем тут нужны' },
-  { id: 5, name: 'Петушня залетная' },
-  { id: 5, name: 'Те которым просто кнопочки потыкать' },
-]
+let groups = ref()
+
+
+function addNewGroupItem () {
+  groups.value.push({name: 'Название группы', modified: false})
+}
+
+
+function saveGroup (item) {
+  let data = { name: item.name }
+
+  if (item.id) { apirator.update('groups', data, { id: item.id }) }
+  else { apirator.insert('groups', data) }
+  return item.modified = false
+}
+
+
+function removeGroup (item) {
+  apirator.delete('groups', { id: item.id })
+  groups.value.delete(item)
+}
+
+
+onMounted( async () => {
+  let dbGroups = await apirator.get('groups')
+
+  groups.value = dbGroups.map( item => {
+    return { id: item.id, name: item.name, modified: false }
+  })
+
+  console.log(groups.value);
+})
 
 </script>
 
@@ -17,20 +44,26 @@ let users = [
     <div class="defusers--header">
       <h3 class="defusers--headTitle">Группы пользователей</h3>
       <div class="defusers--headPanel">
-        <o-button prefix-icon="add_plus" color="info" />
-        <o-button prefix-icon="trash_empty" color="danger" />
+        <o-button prefix-icon="add_plus" color="info" @click="addNewGroupItem"  />
       </div>
     </div>
 
     <div class="defusers--list">
-      <div class="defusers--listItem" v-for="user in users">
-        <div class="defusers--listName">
-          <p class="defusers--listName"> {{  user.name  }} </p>
-        </div>
+      <div class="defusers--listItem" v-for="item in groups" :key="item.id">
+        <o-input v-model="item.name" class="defusers--listName" 
+          @focus="item.modified = true"
+        />
 
         <div class="defusers--listPanel">
-          <o-checkbox color="info" />
-          <o-button prefix-icon="trash_empty" color="danger" />
+          <o-button prefix-icon="trash_empty" color="danger"
+            @click="removeGroup(item)"
+          />
+
+          <o-button prefix-icon="save" 
+            :color="item.modified ? 'success' : 'info'" 
+            :disabled="!item.modified"  
+            @click="saveGroup(item)"
+          />
         </div>
       </div>
     </div>
@@ -61,7 +94,7 @@ let users = [
 
 .defusers--list {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 30px;
   padding: 20px;
 }

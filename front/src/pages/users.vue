@@ -1,12 +1,28 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import apirator from '@/lib/apirator';
 
-let users = [
-  { id: 1, name: 'Иванов И.И' },
-  { id: 2, name: 'Гендальф Белый' },
-  { id: 3, name: 'Обиван Кеноби' },
-  { id: 4, name: 'Зелимхан Чеченец' },
-]
+let router = useRouter()
+let users = ref()
 
+
+function saveUser (user) {
+  apirator.update('users', { name: user.name }, { id: user.id })
+  return true
+}
+
+
+function createNewUser () {
+  router.push({ name: 'usercard', params: { id: false } })
+}
+
+
+onMounted(async () => {
+  users.value = await apirator.get('users')
+
+  console.log(users.value);
+})
 </script>
 
 
@@ -15,8 +31,7 @@ let users = [
     <div class="defusers--header">
       <h3 class="defusers--headTitle">Юзеры</h3>
       <div class="defusers--headPanel">
-        <o-button prefix-icon="add_plus" color="info" />
-        <o-button prefix-icon="trash_empty" color="danger" />
+        <o-button prefix-icon="add_plus" color="info" @click="createNewUser" />
       </div>
     </div>
 
@@ -25,15 +40,22 @@ let users = [
       >
         <div class="defusers--listName">
           <o-avatar :name="user.name" size="xs" color="success"  />
-          <p class="defusers--listName"> {{  user.name  }} </p>
+
+          <o-input v-model="user.name" class="defusers--listName" 
+            @focus="user.modified = true"
+          />
         </div>
 
         <div class="defusers--listPanel">
-          <o-checkbox color="info" />
           <o-button prefix-icon="edit_pencil_01" color="info" 
-            @click="$router.push({ name: 'usercard', params: { name: user.name } })"
+            @click="$router.push({ name: 'usercard', params: { id: user.id } })"
           />
+
           <o-button prefix-icon="trash_empty" color="danger" />
+
+          <o-button prefix-icon="save" :color="user.modified ? 'success' : 'info'" 
+            :disabled="!user.modified" @click="saveUser(user)"
+          />
         </div>
       </div>
     </div>

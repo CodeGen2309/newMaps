@@ -85,6 +85,12 @@
   }
 
 
+  function saveCamera (camera) {
+    activeCamera.value = camera
+    console.log(camera);
+  }
+
+
   function changeActiveCamera (item) {
     if (activeCamera.value) {
       activeCamera.value.setViewOpacity(0.2)
@@ -92,6 +98,8 @@
 
     activeCamera.value = item
     activeCamera.value.setViewOpacity(0.6)
+    console.log(activeCamera.value);
+    
   }
 
   function removeActiveCamera () {
@@ -155,7 +163,9 @@
     </div>
 
     <Transition name="fadeRightAnim">
-      <sideInfo v-if="activeCamera" class="map--sideInfo" />
+      <sideInfo v-if="activeCamera" class="map--sideInfo" :camera="activeCamera"
+        :key="activeCamera.position" @saveCamera="saveCamera"
+      />
     </Transition>
   </div>
 </template>
@@ -184,13 +194,16 @@
 }
 
 .map--toolPanel {
-  background: rgba(255, 255, 255, .6);
-  border: 2px solid white;
+  /* background: rgba(255, 255, 255, .6); */
+  background: var(--grey-lighter);
+  border: 3px solid var(--grey);
+  /* border: 2px solid white; */
   padding: 20px;
   backdrop-filter: blur(10px);
   overflow: hidden;
 
   border-radius: 10px;
+  box-sizing: border-box;
   transition: .3s;
 }
 

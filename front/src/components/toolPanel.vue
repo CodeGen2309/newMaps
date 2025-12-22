@@ -57,7 +57,6 @@ let radius = ref(0)
 
   .tools--title {
     margin: 0; padding: 4px 0px;
-    color: black;
     font-size: 1rem;
   }
   

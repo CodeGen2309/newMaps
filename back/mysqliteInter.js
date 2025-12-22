@@ -1,5 +1,4 @@
 import { DatabaseSync } from "node:sqlite"
-import {  } from "sqlite3"
 
 
 export default class {
@@ -67,7 +66,6 @@ export default class {
     keysString  = dataKeys.join(', ')
     bindString  = dataKeys.map(item => `${item} = ?`).join(', ')
     query       = `UPDATE ${table} SET ${bindString}`
-
 
     if (where) {
       whereKeys   = Object.keys(where)

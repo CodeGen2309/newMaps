@@ -12,7 +12,7 @@ const adminPages = [
     component: () => import('@/pages/groups.vue'),
   },
   {
-    path: '/usercard/:name',
+    path: '/usercard/:id',
     name: 'usercard',
     component: () => import('@/pages/usercard.vue'),
   },

@@ -1,23 +1,68 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import apirator from '@/lib/apirator';
 
+let router = useRouter()
 let params = useRoute().params
-let userName = ref('')
+let userID = params.id
 
-let userGroups = [
-  { id: 1, name: 'Безопасники' },
-  { id: 2, name: 'Админы' },
-  { id: 3, name: 'Охрана' },
-  { id: 4, name: 'Хер пойми зачем тут нужны' },
-  { id: 5, name: 'Петушня залетная' },
-  { id: 5, name: 'Те которым просто кнопочки потыкать' },
-]
+let groupsList = ref([])
+let user = ref({
+  name: 'Новый пользователь', login: 'newUser',
+  password: 'newPassword', isAdmin: 0,
+  groups: []
+})
 
 
+//TODO ну ты понял =)
+async function getUser ( id ) {
+  let req     = await apirator.get('users', { id })
+  let user    = req[0]
 
-onMounted(() => {
-  userName.value = params.name
+  user.groups = JSON.parse(user.groups)
+
+  // TODO переписать этот кусок в отдельную функцию навеное
+  groupsList.value.forEach( item => {
+    item.active = user.groups.includes(item.id)
+  })
+
+  return user
+}
+
+
+async function getGroups () {
+  let req = await apirator.get('groups')
+
+  return req.map(item => {
+    return { id: item.id, name: item.name, active: false }
+  })
+}
+
+
+async function saveUser  () {
+  user.value.groups = JSON.stringify(user.value.groups)
+
+  if (user.value.isAdmin) { user.value.isAdmin = 1 }
+  else { user.value.isAdmin = 0 }
+
+  if   (userID == 'false') { apirator.insert('users', user.value) }
+  else { apirator.update('users', user.value, { id: userID }) }
+
+  return router.push({ name: 'users' })
+}
+
+
+async function deleteUser  () {
+  apirator.delete('users', { id: userID })
+  return router.push({ name: 'users' })
+}
+
+
+onMounted( async () => {
+  groupsList.value = await getGroups()
+
+  if ( userID != 'false' ) { user.value = await getUser(userID) }
 })
 </script>
 
@@ -25,31 +70,36 @@ onMounted(() => {
 <template>
   <section class="user">
     <div class="user--header">
-      <h3 class="user--headTitle">{{  userName  }}</h3>
+      <h3 class="user--headTitle" :key="user.name">{{  user.name  }}</h3>
     </div>
 
     <div class="user--params">
-      <OInput label="Имя" v-model="userName" />
-      <OInput label="Логин" />
-      <OInput label="Пароль" />
+      <OInput label="Имя" v-model="user.name" />
+      <OInput label="Логин" v-model="user.login" />
+      <OInput label="Пароль" v-model="user.password" />
     </div>
 
-     <div class="user--groups">
-      <OCheckbox v-for="item in userGroups"
-        class="user--groupsItem" 
-        :label="item.name" 
+    <div class="user--groups">
+      <OCheckbox v-for="item in groupsList" :key="item.id" 
+        v-model="user.groups" :input-value="item.id"
+        class="user--groupsItem" :label="item.name" 
+        multiple="true"
       />
-     </div>
 
-     <div class="user--buttons">
-      <OButton color="success" prefix-icon="save" @click="$router.go(-1)">
+      <OCheckbox class="user--groupsItem user--groupsItem-admin" 
+        v-model="user.isAdmin" label="режим Боженьки"
+      />
+    </div>
+
+    <div class="user--buttons">
+      <OButton color="success" prefix-icon="save" @click="saveUser">
         Сохранить
       </OButton>
 
-      <OButton color="danger" prefix-icon="trash_full" @click="$router.go(-1)">
+      <OButton v-if="userID != 'false'" color="danger" prefix-icon="trash_full" @click="deleteUser">
         Удалить
       </OButton>
-     </div>
+    </div>
   </section>
 </template>
 
@@ -101,9 +151,12 @@ onMounted(() => {
   align-items: flex-end;
   flex-grow: 1;
 
-  
-
   padding: 20px;
+}
+
+.user--groupsItem-admin {
+  background: #16a085;
+  font-weight: 600;
 }
 
 </style>

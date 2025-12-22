@@ -18,7 +18,6 @@ app.use(cors());
 app.listen(3000, () => console.log("Server is running"));
 app.get("/", (req, res) => { controller.select('groups', req, res) })
 
-
 app.post("/api/users/get",      (req, res) => { controller.select('users', req, res) })
 app.post("/api/users/insert",   (req, res) => { controller.insert('users', req, res) })
 app.post("/api/users/update",   (req, res) => { controller.update('users', req, res) })

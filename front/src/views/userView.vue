@@ -1,12 +1,14 @@
 <script setup>
-  import { onMounted } from 'vue';
-  import maps from '../../public/mocks/maps.js';
-  import userMap from '@/components/map.vue'
+import { onMounted } from 'vue';
+import maps from '../../public/mocks/maps.js';
+import userMap from '@/components/map.vue'
+import userStore from '@/stores/userStore.js';
 
+let user = userStore.user
 
-  onMounted(() => {
-    console.log(maps);
-  })
+onMounted(() => {
+  console.log(maps);
+})
 </script>
 
 
@@ -24,8 +26,9 @@
       </ul>
 
       <div class="maps--menuFooter">
-        <OButton color="info" @click="$router.push({ name: 'users' })"
-          prefix-icon="settings_future" block="true"
+        <OButton color="info" v-if="user.isAdmin"
+          @click="$router.push({ name: 'users' })"
+          prefix-icon="settings_future" block="true" 
         >
           Админка
         </OButton>

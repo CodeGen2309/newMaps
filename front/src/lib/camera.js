@@ -4,7 +4,12 @@ export default class {
   constructor ({
     radius = 200, position = [0, 0],
     scale = 1, angle = 30,
-    cameraAngle = 40
+    cameraAngle = 40,
+    cameraIP = '127.0.0.1', 
+    hostIP = '127.0.0.1', 
+    status = 'offline',
+    mapID = '1',
+    groups = [],
   }) {
 
     this.position = position
@@ -13,10 +18,13 @@ export default class {
     this.viewAngle = angle
     this.cameraAngle = cameraAngle
     this.areaOpacity = 0.2
+    this.cameraIP = cameraIP
+    this.hostIP = hostIP
+    this.status = status
+    this.groups = groups
+    this.mapID = mapID
 
     this.group = new paper.Group()
-    // this.eye = this.createEye()
-    // this.viewZone = this.createZone()
   }
 
   

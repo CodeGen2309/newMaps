@@ -1,32 +1,42 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import user from '@/stores/userStore.js';
 import { useNotif } from '@orion.ui/orion';
+
+import userStore from '@/stores/userStore';
+import apirator from '@/lib/apirator';
+
 
 let router = useRouter()
 let login = ref()
 let password = ref()
 
 
-function signIn () {
-  let logUserIn = user.signIn(login.value, password.value)
-  console.log(login.value, password.value);
-  
+async function signIn () {
+  let filter = { login: login.value }
+  let req    = await apirator.get('users', filter)
+  let user   = req[0]
 
-  if (!logUserIn) { 
-    console.log(logUserIn);
-    return useNotif.danger('Неправильный логин или пароль') 
+  if ( res.length == 0 ) {
+    return useNotif.danger('Нерправильный логин')
   }
 
-  $cookies.set('mapsLogin', true)  
-  router.push({ name: 'maps' })
+  if ( user.password != password.value ) { 
+    return useNotif.danger('Нерправильный пароль')
+  }
+
+  userStore.setUser(user)
+  return router.push({ name: 'maps' })
 }
 
 
-onMounted(() => {
-  let session = $cookies.get('mapsLogin')
-  if (session) { router.push({ name: 'maps' }) }
+onMounted(async () => {
+  let session = await userStore.checkSesion()
+
+  console.log({ currUser: userStore.user });
+
+  if ( !session ) { return false }
+  return router.push({ name: 'maps' })
 })
 
 </script>
