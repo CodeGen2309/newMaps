@@ -66,18 +66,11 @@ function setCamera (ent) {
     }
 
     item.group.onClick = ent => {
-      changeActiveCamera(item)
-      console.log(item);
+      changeActiveCamera(item)      
     }
 
     changeActiveCamera(item)
   }
-}
-
-
-function saveCamera (camera) {
-  activeCamera.value = camera
-  console.log(camera);
 }
 
 
@@ -91,14 +84,13 @@ async function loadCameraList () {
 
 
 function loadCamera (cameraData) {
-  let item = new camera({
-    paper: paper,
-    id: cameraData.id,
-    position: JSON.parse(cameraData.mapGroupPosition),
-    mapGroupPosition: JSON.parse(cameraData.mapGroupPosition),
-    cameraAngle: cameraData.cameraAngle,
-    groups: JSON.parse(cameraData.groups),
-  })
+  cameraData.paper = paper
+  cameraData.position = JSON.parse(cameraData.mapGroupPosition)
+  cameraData.mapGroupPosition = JSON.parse(cameraData.mapGroupPosition)
+  cameraData.groups = JSON.parse(cameraData.groups)
+
+
+  let item = new camera(cameraData)
 
   mapGroup.addChild(item.group)
   item.createCamera()
@@ -114,7 +106,7 @@ function changeActiveCamera (item) {
     activeCamera.value.setViewOpacity(0.2)
   }
 
-  activeCamera.value = item
+  activeCamera.value = item  
   activeCamera.value.setViewOpacity(0.6)
 }
 
@@ -153,30 +145,23 @@ onMounted(() => {
   mapGroup = new paper.Group()
 
   let image = new paper.Raster('/img/map.jpg')
-  mapGroup.addChild(image)
-  // mapGroup.position = { x: 0, y: 0 }
 
+  image.onLoad = function () {
+    image.position = { 
+      x: 0 + image.bounds.width / 2, 
+      y: 0 + image.bounds.height / 2
+    }
+  }
+
+  mapGroup.addChild(image)
 
   mapGroup.onMouseDrag = function (event) {
     mapGroup.position.x += event.delta.x
     mapGroup.position.y += event.delta.y
   }
 
-
   paper.view.onMouseMove = function (ent) {
     canvasCursorPoint = ent.point
-  }
-
-
-  mapGroup.onClick = function (ent) {
-    let poin = ent.point
-    let bounds = mapGroup.bounds
-    
-    let respoint = { 
-      x: poin.x - bounds.left, y: poin.y - bounds.top 
-    }
-
-    console.log(poin);
   }
 
 
@@ -218,7 +203,7 @@ onMounted(() => {
     <Transition name="fadeRightAnim">
       <sideInfo v-if="activeCamera" class="map--sideInfo" :camera="activeCamera"
         :key="activeCamera.position"
-        saveCamera="saveCamera"
+        saveCamera="saveCamera("
       />
     </Transition>
   </div>
