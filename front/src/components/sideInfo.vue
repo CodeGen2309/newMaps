@@ -4,9 +4,7 @@ import apirator from '@/lib/apirator'
 import { useNotif } from '@orion.ui/orion'
 
 let props = defineProps(['camera'])
-
 let groupsList = ref([])
-let groups     = ref([])
 
 
 async function saveCamera () {

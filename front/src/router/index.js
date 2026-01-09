@@ -16,6 +16,16 @@ const adminPages = [
     name: 'usercard',
     component: () => import('@/pages/usercard.vue'),
   },
+  {
+    path: '/maplist',
+    name: 'maplist',
+    component: () => import('@/pages/maplist.vue'),
+  },
+  {
+    path: '/mapcard/:id',
+    name: 'mapcard',
+    component: () => import('@/pages/mapcard.vue'),
+  },
 ]
 
 

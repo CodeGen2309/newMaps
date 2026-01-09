@@ -1,30 +1,83 @@
 <script setup>
 import { onMounted, ref, Transition, useTemplateRef } from "vue";
 
-import apirator from "@/lib/apirator";
+import apirator  from "@/lib/apirator";
 import toolPanel from "@/components/toolPanel.vue";
-import sideInfo from "@/components/sideInfo.vue";
+import sideInfo  from "@/components/sideInfo.vue";
 
-import paper from "paper"
+import paper  from "paper"
 import camera from '@/lib/camera.js'
-import utils from '@/lib/multiTool.js'
+import utils  from '@/lib/multiTool.js'
 
 
 // Init reactives
-let mapList = ref([])
 let cameraList = null
 
 let mapGroup
 let activeCamera = ref()
 
-let Factor = 1
-let canvasCursorPoint   = {x: 0, y: 0}
+let canvasCursorPoint = {x: 0, y: 0}
 let canvasItem = useTemplateRef('canvasItem')
 
 
 function eventLogger (ent) {
   console.log('EVENT!');
   console.log(ent);
+}
+
+
+function setupMap (mapID) {
+  paper.setup(canvasItem.value)
+  mapGroup = new paper.Group()
+
+  let image = new paper.Raster('/img/map.jpg')
+
+  image.onLoad = function () {
+    image.position = { 
+      x: 0 + image.bounds.width / 2, 
+      y: 0 + image.bounds.height / 2
+    }
+  }
+
+  mapGroup.addChild(image)
+
+  mapGroup.onMouseDrag = function (event) {
+    mapGroup.position.x += event.delta.x
+    mapGroup.position.y += event.delta.y
+  }
+
+  paper.view.onMouseMove = function (ent) {
+    canvasCursorPoint = ent.point
+  }
+}
+
+
+async function getMap (params) {
+  
+}
+
+
+async function loadCameraList () {
+  cameraList = await apirator.get('cameras')
+  
+  for (let item of cameraList) {
+    loadCamera(item)
+  }
+}
+
+
+function loadCamera (cameraData) {
+  cameraData.paper = paper
+  cameraData.position = JSON.parse(cameraData.mapGroupPosition)
+  cameraData.mapGroupPosition = JSON.parse(cameraData.mapGroupPosition)
+  cameraData.groups = JSON.parse(cameraData.groups)
+
+  let item = new camera(cameraData)
+
+  mapGroup.addChild(item.group)
+  item.createCamera()
+
+  item.group.onClick = ent => changeActiveCamera(item)
 }
 
 
@@ -66,38 +119,11 @@ function setCamera (ent) {
     }
 
     item.group.onClick = ent => {
-      changeActiveCamera(item)      
+      changeActiveCamera(item)
     }
 
     changeActiveCamera(item)
   }
-}
-
-
-async function loadCameraList () {
-  cameraList = await apirator.get('cameras')
-  
-  for (let item of cameraList) {
-    loadCamera(item)
-  }
-}
-
-
-function loadCamera (cameraData) {
-  cameraData.paper = paper
-  cameraData.position = JSON.parse(cameraData.mapGroupPosition)
-  cameraData.mapGroupPosition = JSON.parse(cameraData.mapGroupPosition)
-  cameraData.groups = JSON.parse(cameraData.groups)
-
-
-  let item = new camera(cameraData)
-
-  mapGroup.addChild(item.group)
-  item.createCamera()
-
-  item.group.onClick = ent => changeActiveCamera(item)
-  console.log(item);
-  
 }
 
 
@@ -109,6 +135,7 @@ function changeActiveCamera (item) {
   activeCamera.value = item  
   activeCamera.value.setViewOpacity(0.6)
 }
+
 
 function removeActiveCamera () {
   let camera = activeCamera.value
@@ -141,30 +168,7 @@ function changeAngle (viewAngle) {
 
 
 onMounted(() => {
-  paper.setup(canvasItem.value)
-  mapGroup = new paper.Group()
-
-  let image = new paper.Raster('/img/map.jpg')
-
-  image.onLoad = function () {
-    image.position = { 
-      x: 0 + image.bounds.width / 2, 
-      y: 0 + image.bounds.height / 2
-    }
-  }
-
-  mapGroup.addChild(image)
-
-  mapGroup.onMouseDrag = function (event) {
-    mapGroup.position.x += event.delta.x
-    mapGroup.position.y += event.delta.y
-  }
-
-  paper.view.onMouseMove = function (ent) {
-    canvasCursorPoint = ent.point
-  }
-
-
+  setupMap()
   loadCameraList()
 })
 </script>

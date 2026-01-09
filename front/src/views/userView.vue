@@ -1,13 +1,25 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import maps from '../../public/mocks/maps.js';
 import userMap from '@/components/map.vue'
 import userStore from '@/stores/userStore.js';
 
-let user = userStore.user
+import apirator from '@/lib/apirator.js';
 
-onMounted(() => {
-  console.log(maps);
+let user = userStore.user
+let currMaps = ref([])
+
+onMounted(async () => {
+  let res = await apirator.get('maps')
+
+  currMaps.value = res.map(item => {
+    return {
+      id: item.id, name: item.name, 
+      groups: JSON.parse(item.groups)
+    }
+  })
+
+  console.log({ res });
 })
 </script>
 
@@ -23,6 +35,8 @@ onMounted(() => {
             {{ item.title }}
           </o-button>
         </RouterLink>
+
+        <h4 v-for="item in currMaps">{{ item }}</h4>
       </ul>
 
       <div class="maps--menuFooter">

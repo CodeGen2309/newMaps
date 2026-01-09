@@ -1,23 +1,29 @@
 import express from "express";
 import cors from "cors";
+import multer from "multer";
 import fs from "fs"
 
 import mysqliteController from "./mysqliteController.js";
-let controller = new mysqliteController()
 
-// import dbase from "./dbinter.js"
-// import swissKnife from "./swissKnife.js"
-// const base = new dbase()
 
 const app = express();
+const upload = multer({dest: 'uploads/'});
+const controller = new mysqliteController()
+
 app.use(express.json());
 app.use(cors());
 
 
-// app.use('/', express.static(`public`));
+
+app.use('/uploads', express.static(`./uploads`));
 app.listen(3000, '0.0.0.0', () => console.log("Server is running"));
 app.get("/", (req, res) => { controller.select('groups', req, res) })
 
+
+
+
+// routes
+// TODO: можно свести всё в мидлвару и передавать имя таблциы в запросе
 app.post("/api/users/get",      (req, res) => { controller.select('users', req, res) })
 app.post("/api/users/insert",   (req, res) => { controller.insert('users', req, res) })
 app.post("/api/users/update",   (req, res) => { controller.update('users', req, res) })
@@ -37,3 +43,15 @@ app.post("/api/cameras/get",    (req, res) => { controller.select('cameras', req
 app.post("/api/cameras/insert", (req, res) => { controller.insert('cameras', req, res) })
 app.post("/api/cameras/update", (req, res) => { controller.update('cameras', req, res) })
 app.post("/api/cameras/delete", (req, res) => { controller.delete('cameras', req, res) })
+
+
+// TODO: написать красивый обработкчик и засунуть его в контроллер
+// а то как то из общей картины выходит
+app.post(
+  "/api/upload", 
+  upload.single('file'),
+  (req, res) => { 
+    console.log(req.file);
+    res.send(req.file) 
+  }
+)

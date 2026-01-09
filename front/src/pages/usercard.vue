@@ -8,6 +8,7 @@ let params = useRoute().params
 let userID = params.id
 
 let groupsList = ref([])
+
 let user = ref({
   name: 'Новый пользователь', login: 'newUser',
   password: 'newPassword', isAdmin: 0,

@@ -25,8 +25,9 @@ export default reactive({
   },
 
 
-  checkAdmin () {
-    return this.isAdmin
+  async getUser (id) {
+    if (this.user.id == null) { return false }
+    return this.user
   },
 
 
@@ -42,6 +43,6 @@ export default reactive({
     user = res[0]
     
     this.setUser(user)
-    return true
+    return user
   },
 })

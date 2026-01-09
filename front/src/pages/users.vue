@@ -73,7 +73,7 @@ onMounted(async () => {
   padding: 10px;
 
   box-sizing: border-box;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--grey-dark);
 }
 
 .defusers--headTitle {

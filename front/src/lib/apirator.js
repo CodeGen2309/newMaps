@@ -13,7 +13,7 @@ export default {
   async get (table, filter ) {
     let link = `${this.apiUrl}/api/${table}/get`
     let opts = this.setPostOpts(filter)
-    let req = await fetch(link, opts)
+    let req  = await fetch(link, opts)
 
     return await req.json()
   },
@@ -22,7 +22,7 @@ export default {
   async insert (table, data) {
     let link = `${this.apiUrl}/api/${table}/insert`
     let opts = this.setPostOpts(data)
-    let req = await fetch(link, opts)
+    let req  = await fetch(link, opts)
 
     return await req.json()
   },
@@ -31,7 +31,7 @@ export default {
   async update (table, data, filter) {
     let link = `${this.apiUrl}/api/${table}/update`
     let opts = this.setPostOpts({ data, filter })
-    let req = await fetch(link, opts)
+    let req  = await fetch(link, opts)
 
     return await req.json()
   },
@@ -40,7 +40,19 @@ export default {
   async delete (table, filter) {
     let link = `${this.apiUrl}/api/${table}/delete`
     let opts = this.setPostOpts(filter)
-    let req = await fetch(link, opts)
+    let req  = await fetch(link, opts)
+
+    return await req.json()
+  },
+
+
+  async uploadFile (file) {
+    let link, form, req
+
+    link = `${this.apiUrl}/api/upload`
+    form = new FormData()
+    form.append('file', file)
+    req  = await fetch(link, { method: 'POST', body: form })
 
     return await req.json()
   }

@@ -15,9 +15,9 @@ let pages = [
   },
   { 
     title: 'Список карт', 
-    pageName: '', 
+    pageName: 'maplist', 
     icon: 'map', 
-    disabled: true 
+    disabled: false 
   },
   { 
     title: 'Логи', 

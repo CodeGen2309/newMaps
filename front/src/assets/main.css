@@ -3,17 +3,21 @@ body {
   font-family: 'Courier New', Courier, monospace;
 }
 
-
 :root {
   --base-color: hsl(247 75% 60%);
   --border-color: hsl(247 75% 90%);
   --bakground-color: hsl(247 75% 80%);
 }
 
-
 .flex--row-cc {
   display: flex;
   justify-content: center;
+  align-items: center
+}
+
+.flex--row-sbc {
+  display: flex;
+  justify-content: space-between;
   align-items: center
 }
 
@@ -22,4 +26,11 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.flex--col-csb {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: space-between;
 }
