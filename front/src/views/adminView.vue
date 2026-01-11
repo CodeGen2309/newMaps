@@ -48,7 +48,7 @@ let pages = [
       </div>
 
       <div class="defView--menuFooter">
-        <OButton color="info" @click="$router.push({ name: 'maps' })"
+        <OButton color="info" @click="$router.push({ name: 'userView' })"
           prefix-icon="map_pin" block="true"
         >
           Карты

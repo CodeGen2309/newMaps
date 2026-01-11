@@ -24,52 +24,44 @@ async function getMap () {
 
   map.value = res[0]
   map.value.groups = JSON.parse(res[0].groups)
-
-  
 }
 
 
 function printImage () {
-  mapFileUploaded = false
+  mapFileUploaded.value = false
   console.log(mapFile[0]);
 }
 
 
-
 async function saveMap () {
-  if (mapID) { updateMap() }
-  
+  let fileData, mapData, res
+
   if (!mapFileUploaded.value) {
     console.log('PULOAD MAP IMAEG');
     
-    let fileData = await uploadMapFile()
+    fileData = await apirator.uploadFile(mapFile[0])
     console.log({ fileData });
     
     map.value.imgPath = fileData.path
     mapFileUploaded.value = true
   }
 
-  let mapData = {
+  mapData = {
     name: map.value.name,
     groups: JSON.stringify(map.value.groups),
     imgPath: map.value.imgPath
   }
 
-  
-  let res = await apirator.insert('maps', mapData)
-  console.log({ res });
-  
+  if (mapID) { res = await apirator.update('maps', mapData, { id: mapID }) }
+  else { res = await apirator.insert('maps', mapData) }
+
+  return  router.push({ name: 'userView' })
 }
 
 
-async function updateMap () {
-  console.log('UPLOAD MAP EVENT!');
-  
-}
-
-
-async function uploadMapFile () {  
-  return await apirator.uploadFile(mapFile[0])
+async function deleteMap () {
+  await apirator.delete('maps', { id: mapID })  
+  return  router.push({ name: 'maplist' })
 }
 
 
@@ -117,7 +109,10 @@ onMounted(async () => {
         Сохранить
       </OButton>
 
-      <OButton v-show="mapID" color="danger" prefix-icon="trash_full">
+      <OButton v-show="mapID" color="danger" 
+        prefix-icon="trash_full"
+        @click="deleteMap"
+      >
         Удалить
       </OButton>
     </div>

@@ -1,4 +1,4 @@
-import { createRouter, createMemoryHistory } from 'vue-router'
+import { createRouter, createMemoryHistory, createWebHashHistory } from 'vue-router'
 
 const adminPages = [
   {
@@ -31,9 +31,9 @@ const adminPages = [
 
 const userPages = [
   {
-    path: '/maps',
+    path: '/maps/:id',
     name: 'maps',
-    component: () => import('@/pages/maps.vue'),
+    component: () => import('@/components/map.vue'),
   },
 ]
 

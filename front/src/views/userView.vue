@@ -1,25 +1,31 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import maps from '../../public/mocks/maps.js';
-import userMap from '@/components/map.vue'
-import userStore from '@/stores/userStore.js';
+import { useRoute } from 'vue-router';
 
+import userStore from '@/stores/userStore.js';
 import apirator from '@/lib/apirator.js';
 
+let route = useRoute()
 let user = userStore.user
-let currMaps = ref([])
+let maplist = ref([])
+
+function goToMap (id) {
+  router.push({ name: 'maps', params: { id } })
+  router.go(1)
+}
 
 onMounted(async () => {
+  console.log(user);
+  
+
   let res = await apirator.get('maps')
 
-  currMaps.value = res.map(item => {
+  maplist.value = res.map(item => {
     return {
       id: item.id, name: item.name, 
       groups: JSON.parse(item.groups)
     }
   })
-
-  console.log({ res });
 })
 </script>
 
@@ -27,17 +33,14 @@ onMounted(async () => {
 <template>
   <section class="maps">
     <div class="maps--block maps--menu">
-      <ul class="maps--menuList">
-        <RouterLink v-for="item, id in maps" to="/maps">
-          <o-button block="true"
-            color="brand" prefix-icon="map_pin"
-          >
-            {{ item.title }}
-          </o-button>
-        </RouterLink>
-
-        <h4 v-for="item in currMaps">{{ item }}</h4>
-      </ul>
+      <div class="maps--menuList">
+        <o-button block="true" v-for="item in maplist"
+          color="brand" prefix-icon="map_pin"
+          @click="$router.push({ name: 'maps', params: { id: item.id } })"
+        >
+          {{ item.name }}
+        </o-button>
+      </div>
 
       <div class="maps--menuFooter">
         <OButton color="info" v-if="user.isAdmin"
@@ -50,7 +53,7 @@ onMounted(async () => {
     </div>
 
     <div class="maps--block maps--content">
-      <userMap></userMap>
+      <RouterView :key="route.fullPath" />
     </div>
   </section>
 </template>
@@ -92,6 +95,7 @@ onMounted(async () => {
 .maps--menuList {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: 20px;
   flex-grow: 1;
 

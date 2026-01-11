@@ -26,7 +26,7 @@ async function signIn () {
   }
 
   userStore.setUser(user)
-  return router.push({ name: 'maps' })
+  return router.push({ name: 'userView' })
 }
 
 
@@ -36,7 +36,7 @@ onMounted(async () => {
   console.log({ currUser: userStore.user });
 
   if ( !session ) { return false }
-  return router.push({ name: 'maps' })
+  return router.push({ name: 'userView'})
 })
 
 </script>

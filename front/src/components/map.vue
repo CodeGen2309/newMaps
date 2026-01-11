@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, Transition, useTemplateRef } from "vue";
+import { useRoute } from "vue-router";
 
 import apirator  from "@/lib/apirator";
 import toolPanel from "@/components/toolPanel.vue";
@@ -8,6 +9,15 @@ import sideInfo  from "@/components/sideInfo.vue";
 import paper  from "paper"
 import camera from '@/lib/camera.js'
 import utils  from '@/lib/multiTool.js'
+
+
+let params = useRoute().params
+let mapID  = params.id
+
+let map = {
+  id: 1, groups: [], name: 'Mock map',
+  imgPath: ''
+}
 
 
 // Init reactives
@@ -26,11 +36,30 @@ function eventLogger (ent) {
 }
 
 
+async function loadMap () {
+  console.log('MAP RELOADED');
+  console.log(mapID);
+  
+
+  let res = await apirator.get('maps', { id: mapID })
+  map = res[0]
+
+  setupMap()
+  await loadCameraList()
+}
+
+
+
+
 function setupMap (mapID) {
   paper.setup(canvasItem.value)
   mapGroup = new paper.Group()
 
-  let image = new paper.Raster('/img/map.jpg')
+  let imgPath = `${apirator.apiUrl}/${map.imgPath}`
+  console.log({ imgPath });
+  
+  
+  let image = new paper.Raster(imgPath)
 
   image.onLoad = function () {
     image.position = { 
@@ -52,13 +81,9 @@ function setupMap (mapID) {
 }
 
 
-async function getMap (params) {
-  
-}
-
 
 async function loadCameraList () {
-  cameraList = await apirator.get('cameras')
+  cameraList = await apirator.get('cameras', { mapID })
   
   for (let item of cameraList) {
     loadCamera(item)
@@ -98,7 +123,8 @@ function setCamera (ent) {
   let item = new camera({
     paper: paper,
     position: ent.point,
-    cameraAngle: utils.getRandomNumber(0, 360)
+    cameraAngle: utils.getRandomNumber(0, 360),
+    mapID: mapID
   })
 
   mapGroup.addChild(item.group)
@@ -167,10 +193,7 @@ function changeAngle (viewAngle) {
 }
 
 
-onMounted(() => {
-  setupMap()
-  loadCameraList()
-})
+onMounted(loadMap)
 </script>
 
 
