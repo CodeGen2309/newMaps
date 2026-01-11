@@ -26,9 +26,7 @@ onMounted(async () => {
       <div class="maplist--listItem flex--row-sbc" 
         v-for="item in maps"
       >
-        <o-input v-model="item.name" class="maplist--mapname" 
-          @focus="item.modified = true"
-        />
+        <p class="maplist--mapname">{{ item.name }}</p>
 
         <div class="maplist--listPanel">
           <o-button prefix-icon="edit_pencil_01" color="info"

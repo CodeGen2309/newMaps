@@ -34,7 +34,7 @@ export default class {
   
   createEye () {
     let eye = new paper.Raster({
-      source: '/icons/eosMin.png',
+      source: '/icons/cctv.png',
       position: this.position,
     })
 

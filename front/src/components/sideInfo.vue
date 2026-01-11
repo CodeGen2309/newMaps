@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted, ref, defineProps } from 'vue'
-import apirator from '@/lib/apirator'
 import { useNotif } from '@orion.ui/orion'
+
+import apirator from '@/lib/apirator'
+import userStore from '@/stores/userStore';
 
 let props = defineProps(['camera'])
 let groupsList = ref([])
+let user = userStore.user
 
 
 async function saveCamera () {
@@ -49,22 +52,25 @@ onMounted( async () => {
     <label class="sInfo--label">
       <p class="sInfo--title">IP камеры</p>
       <OInput v-model="camera.cameraIP" label="IP камеры"
+        :disabled="!user.isAdmin"
         class="sInfo--input"
       />
     </label>
 
     <label class="sInfo--label">
       <p class="sInfo--title">IP регистратора</p>
-      <OInput v-model="camera.hostIP" label="IP регистратора" />
+      <OInput v-model="camera.hostIP" label="IP регистратора" :disabled="!user.isAdmin" />
     </label>
 
     <label class="sInfo--label">
       <p class="sInfo--title">Статус</p>
-      <OInput v-model="camera.status" label="Статус" disabled="true" />
+      <!-- <OInput v-model="camera.status" label="Статус" disabled="true" /> -->
+      <OInput label="Статус" placeholder="В разработке" disabled="true" />
     </label>
 
-    <div class="sInfo--groups">
+    <div class="sInfo--groups" v-show="user.isAdmin">
       <p class="sInfo--title">Группы пользователей</p>
+
       <OCheckbox class="sInfo--checkGroup" 
         v-for="group in groupsList" :key="group.id" 
         :label="group.name" v-model="camera.groups" 
@@ -77,6 +83,7 @@ onMounted( async () => {
 
     <OButton color="info" 
       click="$emit('saveCamera', camera)"
+      v-show="user.isAdmin"
       @click="saveCamera"
     >
       Сохранить

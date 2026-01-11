@@ -1,23 +1,34 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import userStore from '@/stores/userStore.js';
 import apirator from '@/lib/apirator.js';
 
+let router = useRouter()
 let route = useRoute()
 let user = userStore.user
 let maplist = ref([])
 
-function goToMap (id) {
-  router.push({ name: 'maps', params: { id } })
-  router.go(1)
+
+function logOut () {
+  userStore.logOut()
+  router.push({ name: 'welcome' })
 }
 
-onMounted(async () => {
-  console.log(user);
-  
 
+function checkAccess (groups) {
+  if (user.isAdmin) { return true }
+
+  for (let group of user.groups) {
+    if (groups.includes(group)) { return true }
+  }
+
+  return false
+}
+
+
+onMounted(async () => {
   let res = await apirator.get('maps')
 
   maplist.value = res.map(item => {
@@ -36,6 +47,7 @@ onMounted(async () => {
       <div class="maps--menuList">
         <o-button block="true" v-for="item in maplist"
           color="brand" prefix-icon="map_pin"
+          v-show="checkAccess(item.groups)"
           @click="$router.push({ name: 'maps', params: { id: item.id } })"
         >
           {{ item.name }}
@@ -48,6 +60,12 @@ onMounted(async () => {
           prefix-icon="settings_future" block="true" 
         >
           Админка
+        </OButton>
+
+        <OButton color="danger" @click="logOut"
+          prefix-icon="exit" block="true" 
+        >
+          Выход
         </OButton>
       </div>
     </div>

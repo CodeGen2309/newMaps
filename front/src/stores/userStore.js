@@ -31,6 +31,11 @@ export default reactive({
   },
 
 
+  async logOut () {
+    return $cookies.set('newMapsUser', false)
+  },
+
+
   async checkSesion () {
     let id, res, user
 
@@ -39,7 +44,7 @@ export default reactive({
     if (id == "undefined") { return false }
     if (!id) { return false }
 
-    res  = await apirator.get('users', { id })    
+    res  = await apirator.get('users', { id })
     user = res[0]
     
     this.setUser(user)

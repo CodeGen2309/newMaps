@@ -5,6 +5,7 @@ import { useRoute } from "vue-router";
 import apirator  from "@/lib/apirator";
 import toolPanel from "@/components/toolPanel.vue";
 import sideInfo  from "@/components/sideInfo.vue";
+import userStore from "@/stores/userStore";
 
 import paper  from "paper"
 import camera from '@/lib/camera.js'
@@ -12,6 +13,7 @@ import utils  from '@/lib/multiTool.js'
 
 
 let params = useRoute().params
+let user = userStore.user
 let mapID  = params.id
 
 let map = {
@@ -208,14 +210,14 @@ onMounted(loadMap)
     <div class="map--tools">      
       <Transition name="fadeUpAnim">
         <toolPanel class="map--toolPanel"
-          v-if="activeCamera" :camera="activeCamera"
+          v-if="activeCamera && user.isAdmin" :camera="activeCamera"
           @rotateEvent="rotateCamera"
           @viewAngle="changeAngle"
           @radiusEvent="changeRadius"
         />
       </Transition>
 
-      <div class="map--toolButtons">
+      <div class="map--toolButtons" v-show="user.isAdmin">
         <OButton class="map--addCamera" color="info" 
           prefix-icon="camera" @click="setCamera" block="true"
         >Добавить камеру</OButton>
